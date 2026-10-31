@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><title>Stickman Studio PC</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0f1115;--card:#181b22;--line:#2a2f3a;--t:#e9ecf1;--m:#9aa3b2;--a:#ffcc33;--g:#3ddc84;--r:#ff5c5c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 system-ui,Segoe UI,Arial}
+header{display:flex;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+header h1{font-size:18px;margin:0}header .v{color:var(--m);font-size:12px}
+main{display:grid;grid-template-columns:420px 1fr;gap:16px;padding:16px;max-width:1500px;margin:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h2{font-size:15px;margin:0 0 10px}
+label{display:block;color:var(--m);font-size:12px;margin:8px 0 3px}
+input,select,textarea{width:100%;background:#0c0e12;color:var(--t);border:1px solid var(--line);border-radius:8px;padding:8px}
+textarea{min-height:170px;resize:vertical}
+button{background:var(--a);color:#111;border:0;border-radius:8px;padding:9px 12px;font-weight:600;cursor:pointer;margin:3px 2px}
+button.sec{background:#2a2f3a;color:var(--t)}button.red{background:var(--r);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.acc{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--line)}.acc span{flex:1}
+.big{width:100%;padding:14px;font-size:16px}
+#log{background:#07080a;border-radius:8px;height:260px;overflow:auto;font:12px/1.4 Consolas,monospace;padding:8px;white-space:pre-wrap}
+.bar{height:8px;background:#0c0e12;border-radius:5px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--g);width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sc{background:#0c0e12;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12px}
+.sc .im{aspect-ratio:16/9;background:#20242c;display:flex;align-items:center;justify-content:center;color:var(--m)}
+.sc .im img{width:100%;height:100%;object-fit:cover}
+.sc .tx{padding:6px 8px}.sc textarea{min-height:52px;font-size:11px;margin-top:4px}
+.sc .tl{display:flex;justify-content:space-between;align-items:center;padding:0 6px 6px}
+.ok{color:var(--g)}.bad{color:var(--r)}.muted{color:var(--m);font-size:12px}
+video{width:100%;border-radius:10px;margin-top:8px}
+</style></head><body>
+<header><h1>🎬 Stickman Studio PC</h1><span class="v" id="ver"></span><span style="flex:1"></span>
+<select id="projSel" style="width:220px"></select><button class="sec" id="btnNewProj">➕ Naya project</button></header>
+<main>
+<div>
+ <div class="card"><h2>1) Google accounts</h2>
+  <div id="accs" class="muted">Abhi koi account nahi.</div>
+  <div class="row" style="margin-top:8px"><input id="accName" placeholder="Naam (jaise: Main account)"><button id="btnAddAcc">➕ Google account add karo</button></div>
+  <button class="sec" id="btnCheckAcc">✅ Sign-in check karo</button>
+  <p class="muted">Add dabane par ek alag Chrome window khulegi — usme apna Google account sign in karo. Password app me save nahi hota. Ek account ki daily limit khatam hogi to app agla account khud lega.<br>Pehli baar: har account me <b>Flow</b> dabao, Flow ko Google se allow karo, naya project kholo aur mode <b>Image</b> + ratio 16:9 set kar do — app wahi tab use karega.</p>
+  <div class="muted" id="chromeInfo"></div>
+ </div>
+ <div class="card"><h2>2) Settings</h2>
+  <div class="row"><div><label>Style</label><select id="preset"><option value="survival">Survival / suspense</option><option value="history">History / facts</option><option value="custom">Custom</option></select></div>
+  <div><label>Language</label><select id="lang"><option value="hi">Hindi</option><option value="hinglish">Hinglish</option><option value="en">English</option></select></div></div>
+  <div class="row"><div><label>Scene min sec</label><input id="min_s" type="number"></div><div><label>Scene max sec</label><input id="max_s" type="number"></div></div>
+  <div class="row"><div><label>Format</label><select id="aspect"><option value="16:9">16:9 YouTube</option><option value="9:16">9:16 Shorts</option></select></div>
+  <div><label>Quality</label><select id="res"><option value="1080">1080p (fast)</option><option value="4k">4K</option></select></div>
+  <div><label>FPS</label><select id="fps"><option>24</option><option>30</option></select></div></div>
+  <div class="row"><div><label>Voice source</label><select id="voice_mode"><option value="aistudio">🤖 AI Studio (automatic)</option><option value="upload">🎤 Meri voice file</option></select></div>
+  <div><label>AI Studio voice</label><select id="voice"></select></div></div>
+  <label>Voice style (khali = preset wala)</label><input id="style" placeholder="calm, deep, suspense narrator">
+  <div class="row"><div><label>Motion</label><select id="motion"><option value="pan">Slow pan/zoom</option><option value="none">Still</option></select></div>
+  <div><label>Transition</label><select id="transition"><option value="cut">Cut</option><option value="fade">Fade</option></select></div>
+  <div><label>Kinare crop %</label><input id="edge_crop" type="number" min="0" max="12"></div></div>
+  <label><input type="checkbox" id="attach_ref" style="width:auto"> Har Flow image me character reference attach karo</label>
+  <label>Extra notes for story / images</label><input id="notes" placeholder="e.g. desert, night, dark mood">
+  <div class="row" style="margin-top:8px">
+   <button class="sec" id="btnRef">🧍 Character image</button><button class="sec" id="btnMusic">🎵 Music</button><button class="sec" id="btnVoiceUp">🎤 Voice file</button>
+  </div>
+  <div class="muted" id="assetInfo"></div>
+  <input type="file" id="fRef" accept="image/*" hidden><input type="file" id="fMusic" accept="audio/*" hidden>
+  <input type="file" id="fVoice" accept="audio/*,video/*" hidden><input type="file" id="fImgs" accept="image/*,.zip" multiple hidden>
+ </div>
+</div>
+<div>
+ <div class="card"><h2>3) Script</h2>
+  <textarea id="script" placeholder="Poori script yahan paste karo. (Optional: 'SCENE: prompt' + narration lines wala format bhi chalega)"></textarea>
+  <button id="btnSplit">✂️ Scenes banao</button><span class="muted" id="scInfo"></span>
+ </div>
+ <div class="card"><h2>4) Banao</h2>
+  <button class="big" id="btnAll">🚀 Sab automatic — prompts → voice → Flow images → final video</button>
+  <div class="row"><button class="sec" id="btnPrompts">✍️ Prompts</button><button class="sec" id="btnPromptsF">✍️ Prompts dobara</button><button class="sec" id="btnVoice">🎤 Voice</button>
+  <button class="sec" id="btnImages">🖼️ Images (Flow)</button><button class="sec" id="btnRender">🎞️ Render</button></div>
+  <div class="row"><button class="sec" id="btnImport">📥 Images/ZIP import</button><button class="sec" id="btnOpen">📂 Folder kholo</button><button class="red" id="btnStop">⏹ Stop</button></div>
+  <div class="bar"><i id="prog"></i></div><div class="muted" id="jobInfo"></div>
+  <div id="log"></div>
+  <button class="sec" id="btnCopyLog">📋 Log copy</button><button class="sec" id="btnDebug">🐞 Debug folder</button>
+  <div id="finalBox"></div>
+ </div>
+ <div class="card"><h2>Scenes</h2><div class="grid" id="scenes"></div></div>
+</div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let P = localStorage.getItem('proj') || '', logN = 0, last = null, sceneSig = '';
+const FIELDS = ['preset','lang','min_s','max_s','aspect','res','fps','voice_mode','voice','style','motion','transition','edge_crop','notes'];
+async function api(path, body) {
+  const r = await fetch(path, {method: body === undefined ? 'GET' : 'POST', headers: {'Content-Type': 'application/json'}, body: body === undefined ? undefined : JSON.stringify(body)});
+  const j = await r.json().catch(() => ({})); if (!r.ok) { alert(j.error || 'Error'); throw new Error(j.error); } return j;
+}
+async function upload(kind, file, last) {
+  const r = await fetch(`/api/upload?project=${encodeURIComponent(P)}&kind=${kind}&last=${last ? 1 : 0}`, {method: 'POST', headers: {'X-Filename': encodeURIComponent(file.name)}, body: file});
+  if (!r.ok) alert('Upload fail');
+}
+function settings() { const s = {}; for (const f of FIELDS) s[f] = $(f).value; s.attach_ref = $('attach_ref').checked; s.min_s = +s.min_s; s.max_s = +s.max_s; s.fps = +s.fps; s.edge_crop = +s.edge_crop; return s; }
+let saveT; function saveSoon() { clearTimeout(saveT); saveT = setTimeout(() => api('/api/settings', {project: P, settings: settings(), script: $('script').value}), 500); }
+for (const f of FIELDS) $(f).addEventListener('change', saveSoon); $('attach_ref').onchange = saveSoon; $('script').addEventListener('input', saveSoon);
+$('preset').addEventListener('change', () => { const m = {survival: [6, 8], history: [3, 5], custom: [5, 7]}[$('preset').value]; $('min_s').value = m[0]; $('max_s').value = m[1]; saveSoon(); });
+
+function renderAll(s, first) {
+  $('ver').textContent = s.version + ' · project: ' + s.project;
+  $('projSel').innerHTML = [...new Set([...s.projects, s.project])].map(p => `<option ${p === s.project ? 'selected' : ''}>${p}</option>`).join('');
+  if (first) {
+    $('voice').innerHTML = s.voices.map(v => `<option>${v}</option>`).join('');
+    for (const f of FIELDS) if (s.settings[f] !== undefined) $(f).value = s.settings[f];
+    $('attach_ref').checked = s.settings.attach_ref !== false; $('script').value = s.script || '';
+  }
+  $('chromeInfo').innerHTML = s.chrome ? 'Chrome: ' + s.chrome : '<span class="bad">Chrome nahi mila — Google Chrome install karo.</span>';
+  $('accs').innerHTML = s.accounts.length ? s.accounts.map(a => `<div class="acc"><span>${a.ok === true ? '✅' : a.ok === false ? '❌' : '•'} ${a.name}</span>
+     <button class="sec" onclick="openAcc('${a.id}')">Sign in</button><button class="sec" onclick="openAcc('${a.id}','https://labs.google/fx/tools/flow')">Flow</button><button class="sec" onclick="openAcc('${a.id}','https://aistudio.google.com/generate-speech')">AI Studio</button><button class="sec" onclick="rmAcc('${a.id}','${a.name}')">✖</button></div>`).join('') : 'Abhi koi account nahi.';
+  $('assetInfo').textContent = [s.has_ref ? '🧍 character ✔' : '🧍 character image nahi (optional, consistency ke liye zaroori)', s.has_music ? '🎵 music ✔' : '', s.has_voice_upload ? '🎤 voice file ✔' : ''].filter(Boolean).join(' · ');
+  const nImg = s.scenes.filter(x => x.img).length, nPr = s.scenes.filter(x => x.prompt).length;
+  $('scInfo').textContent = s.scenes.length ? ` ${s.scenes.length} scenes · ${nPr} prompts · ${nImg} images` : '';
+  const busy = !!s.job; for (const b of ['btnAll','btnPrompts','btnPromptsF','btnVoice','btnImages','btnRender','btnImport','btnSplit','btnCheckAcc']) $(b).disabled = busy;
+  $('prog').style.width = (busy ? Math.round(s.progress * 100) : 0) + '%';
+  $('jobInfo').textContent = busy ? `⏳ Chal raha hai: ${s.job} (${Math.round(s.progress * 100)}%)` : '';
+  if (s.log.length) { const L = $('log'); const atEnd = L.scrollTop + L.clientHeight > L.scrollHeight - 30; L.textContent += s.log.join('\n') + '\n'; if (atEnd) L.scrollTop = L.scrollHeight; }
+  logN = s.log_n;
+  const sig = JSON.stringify(s.scenes.map(x => [x.img, x.err, x.prompt.length, x.text.length])) + s.job;
+  if (sig !== sceneSig) { sceneSig = sig; drawScenes(s); }
+  const fs = s.final + ':' + (s.job || '');
+  if ($('finalBox').dataset.s !== fs) { $('finalBox').dataset.s = fs; $('finalBox').innerHTML = s.final && !s.job ? `<p class="ok">✅ Final video: ${s.final_path}</p><video controls src="/api/video?project=${encodeURIComponent(P)}&t=${Date.now()}"></video>` : ''; }
+}
+function esc(t) { return (t || '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c])); }
+function drawScenes(s) {
+  const t = Date.now();
+  $('scenes').innerHTML = s.scenes.map(x => `<div class="sc"><div class="im">${x.img ? `<img loading="lazy" src="/api/img?project=${encodeURIComponent(P)}&n=${x.n}&t=${t}">` : (x.err ? '<span class="bad">❌ ' + x.err + '</span>' : 'image baaki')}</div>
+   <div class="tx"><b>#${x.n}</b> ${esc(x.text)}<textarea data-n="${x.n}" placeholder="image prompt (khali = narration se)">${esc(x.prompt)}</textarea></div>
+   <div class="tl"><span class="muted">${x.dur ? x.dur.toFixed(1) + 's' : ''}</span><button class="sec" ${s.job ? 'disabled' : ''} onclick="regen(${x.n})">🔁 Image dobara</button></div></div>`).join('');
+  document.querySelectorAll('.sc textarea').forEach(ta => ta.onchange = () => api('/api/scene', {project: P, n: +ta.dataset.n, prompt: ta.value}));
+}
+async function poll(first) {
+  try { const s = await (await fetch(`/api/state?project=${encodeURIComponent(P)}&since=${first ? 0 : logN}`)).json(); if (first) { $('log').textContent = ''; } P = s.project; localStorage.setItem('proj', P); renderAll(s, first); } catch (e) {}
+  setTimeout(() => poll(false), 1500);
+}
+async function job(step, extra) { await api('/api/settings', {project: P, settings: settings(), script: $('script').value}); await api('/api/job', {project: P, step, ...(extra || {})}); }
+window.regen = n => job('image_one', {n});
+window.openAcc = (id, url) => api('/api/account/open', {id, url});
+window.rmAcc = (id, n) => { if (confirm(`'${n}' hata du?`)) api('/api/account/remove', {id}); };
+$('btnAddAcc').onclick = () => { api('/api/account/add', {name: $('accName').value}); $('accName').value = ''; };
+$('btnCheckAcc').onclick = () => api('/api/job', {project: P, step: 'check_accounts'});
+$('btnSplit').onclick = async () => { if (sceneSig && document.querySelectorAll('.sc').length && !confirm('Naye scenes banane se purani images/voice hat jayengi. Theek hai?')) return; await api('/api/settings', {project: P, settings: settings()}); await api('/api/split', {project: P, script: $('script').value}); sceneSig = ''; };
+$('btnAll').onclick = () => job('all'); $('btnPrompts').onclick = () => job('prompts'); $('btnPromptsF').onclick = () => job('prompts_force');
+$('btnVoice').onclick = () => job('voice'); $('btnImages').onclick = () => job('images'); $('btnRender').onclick = () => job('render');
+$('btnStop').onclick = () => api('/api/stop', {});
+$('btnOpen').onclick = () => api('/api/open', {project: P}); $('btnDebug').onclick = () => api('/api/open', {project: P, debug: 1});
+$('btnCopyLog').onclick = async () => { const t = await (await fetch('/api/log')).text(); await navigator.clipboard.writeText(t); alert('Log copy ho gaya'); };
+$('btnRef').onclick = () => $('fRef').click(); $('fRef').onchange = e => upload('character', e.target.files[0], 1).then(() => { sceneSig = ''; });
+$('btnMusic').onclick = () => $('fMusic').click(); $('fMusic').onchange = e => upload('music', e.target.files[0], 1);
+$('btnVoiceUp').onclick = () => $('fVoice').click(); $('fVoice').onchange = e => upload('voice', e.target.files[0], 1).then(() => { $('voice_mode').value = 'upload'; });
+$('btnImport').onclick = () => $('fImgs').click();
+$('fImgs').onchange = async e => { const fs = [...e.target.files]; for (let i = 0; i < fs.length; i++) await upload('images', fs[i], i === fs.length - 1); sceneSig = ''; e.target.value = ''; };
+$('projSel').onchange = async () => { P = $('projSel').value; await api('/api/project', {project: P}); location.reload(); };
+$('btnNewProj').onclick = async () => { const n = prompt('Naye project ka naam:'); if (!n) return; const r = await api('/api/project', {project: n}); P = r.project; localStorage.setItem('proj', P); location.reload(); };
+poll(true);
+</script></body></html>
